@@ -2,7 +2,8 @@
 A small python script that lets you preview OBJ data if the required files are provided.
 
 ### REQUIREMENTS
-* Python 3 with Tkinter and Ttk (I forgot which version comes with Ttk, do your research)
+* Python 3 with Tkinter
+* Ttk module for Python (I forgot which version comes with Ttk, newer Python versions have Ttk by default, do your research)
 
 ### NOTES
 * I'm not very proficient at high level languages so a lot of the code is REALLY bad and poorly thought out
