@@ -278,9 +278,9 @@ class MainFrame(tk.Frame):
                         s = 0
                         old_px = px.copy()
                         for u in range(len(px)):
-                            if u&16 != t:
+                            if u&0xF0 != t:
                                 v=15
-                            t=u&16
+                            t=u&0xF0
                             px[u] = old_px[t+v]
                             v=v-1
                     
