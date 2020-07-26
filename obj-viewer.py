@@ -43,7 +43,7 @@ class Toolbar(tk.Frame):
         self.filename = tk.filedialog.askopenfilename(
                         initialdir="./",
                         title="Select COL file",
-                        filetypes=(("SNES Palette File","*.COL"),("All files","*,*"))
+                        filetypes=(("SNES Palette File","*.COL"),("All files","*.*"))
                         )
         if self.decode_col():
             col_file.set("COL File: "+os.path.split(self.filename)[-1])
@@ -53,7 +53,7 @@ class Toolbar(tk.Frame):
         self.filename = tk.filedialog.askopenfilename(
                         initialdir="./",
                         title="Select OBJ file",
-                        filetypes=(("SNES Animation File","*.OBJ"),("All files","*,*"))
+                        filetypes=(("SNES Animation File","*.OBJ"),("All files","*.*"))
                         )
         if self.decode_obj():
             obj_file.set("OBJ File: "+os.path.split(self.filename)[-1])
