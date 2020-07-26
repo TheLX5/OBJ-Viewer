@@ -1,3 +1,9 @@
+##################################################################################
+# OBJ-VIewer v1.1
+
+##################################################################################
+# Libs
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -16,6 +22,8 @@ class Toolbar(tk.Frame):
         
         self.filemenu = tk.Menu(self.menubar, tearoff=0)
         self.filemenu.add_command(label="Open OBJ file", command=self.file_open_obj)
+        self.filemenu.add_command(label="Open OBX file", command=self.file_open_obx)
+        self.filemenu.add_separator()
         self.filemenu.add_command(label="Open CGX file", command=self.file_open_vram)
         self.filemenu.add_command(label="Open COL file", command=self.file_open_col)
         self.filemenu.add_separator()
@@ -55,8 +63,22 @@ class Toolbar(tk.Frame):
                         title="Select OBJ file",
                         filetypes=(("SNES Animation File","*.OBJ"),("All files","*.*"))
                         )
+        global obj_loaded
+        obj_loaded = 0
         if self.decode_obj():
             obj_file.set("OBJ File: "+os.path.split(self.filename)[-1])
+            mainframe.animation_build_frame()
+
+    def file_open_obx(self):
+        self.filename = tk.filedialog.askopenfilename(
+                        initialdir="./",
+                        title="Select OBX file",
+                        filetypes=(("SNES Extended Animation File","*.OBX"),("All files","*.*"))
+                        )
+        global obj_loaded
+        obj_loaded = 1
+        if self.decode_obj():
+            obj_file.set("OBX File: "+os.path.split(self.filename)[-1])
             mainframe.animation_build_frame()
 
     def links_github(self):
@@ -114,9 +136,15 @@ class Toolbar(tk.Frame):
             decoded_obj.clear()
         except FileNotFoundError:
             return False
+
+        if obj_loaded == 0:
+            obj_range = 0x180
+        elif obj_loaded == 1:
+            obj_range = 0x300
+
         for k in range(128):
             decoded_obj["frame "+str(k)] = []
-            for i in range(0x180):
+            for i in range(obj_range):
                 try:
                     decoded_obj["frame "+str(k)].append(self.obj_data[i+(0x180*k)])
                 except:
@@ -163,31 +191,88 @@ class MainFrame(tk.Frame):
         
     def animation_preview_widget(self):
         self.frame_frame = tk.Frame(self.animation_preview)
-        self.offset_label = tk.Label(self.frame_frame, text="VRAM Offset: ")
-        self.offset_label.pack(side=tk.LEFT)
-        self.offset_num = tk.Spinbox(self.frame_frame,
-                                     from_=0, to=65536,
-                                     increment=64,
-                                     command=self.animation_build_frame,
-                                     textvariable=default_offset)
-        self.offset_num.bind("<Return>", self.animation_build_pose_return)
-        self.offset_num.pack(side=tk.LEFT)
-        self.frame_label = tk.Label(self.frame_frame, text="Animation frame: ")
-        self.frame_label.pack(side=tk.LEFT)
+
+        self.frame_label = tk.Label(self.frame_frame, text="Animation frame:")
+        self.frame_label.pack(side=tk.LEFT, padx=3)
         self.frame_num = tk.Spinbox(self.frame_frame,
                                     from_=0, to=127,
                                     increment=1,
+                                    width=8,
                                     command=self.animation_build_frame,
                                     textvariable=default_frame)
         self.frame_num.bind("<Return>", self.animation_build_pose_return)
         self.frame_num.pack(side=tk.LEFT)
-        self.frame_frame.pack()
+
+        self.offset_label = tk.Label(self.frame_frame, text="VRAM Offset:")
+        self.offset_label.pack(side=tk.LEFT, padx=3)
+        self.offset_num = tk.Spinbox(self.frame_frame,
+                                     from_=0, to=65536,
+                                     increment=64,
+                                     width=8,
+                                     command=self.animation_build_frame,
+                                     textvariable=default_offset)
+        self.offset_num.bind("<Return>", self.animation_build_pose_return)
+        self.offset_num.pack(side=tk.LEFT)
+
+        self.size_label = tk.Label(self.frame_frame, text="Object size:")
+        self.size_label.pack(side=tk.LEFT,padx=3)
+        self.size_num = ttk.Combobox(self.frame_frame,
+                                     state="readonly",
+                                     values=obj_sizes)
+        self.size_num.config(width=15)
+        self.size_num.set("8x8 16x16")
+        self.size_num.bind("<Return>", self.animation_build_pose_return)
+        self.size_num.bind("<<ComboboxSelected>>", self.animation_build_pose_return)
+        self.size_num.pack(side=tk.LEFT)
+
+        self.frame_frame.pack(pady=2)
+
+
+        self.camera_frame = tk.Frame(self.animation_preview)
+
+
+        self.center_x_label = tk.Label(self.camera_frame, text="Camera X Offset:")
+        self.center_x_label.pack(side=tk.LEFT, padx=3)
+        self.center_x_num = tk.Spinbox(self.camera_frame,
+                                     from_=0, to=512,
+                                     increment=1,
+                                     width=4,
+                                     command=self.animation_build_frame,
+                                     textvariable=default_center_x)
+        self.center_x_num.bind("<Return>", self.animation_build_pose_return)
+        self.center_x_num.pack(side=tk.LEFT)
+        
+        self.center_y_label = tk.Label(self.camera_frame, text="Camera Y Offset:")
+        self.center_y_label.pack(side=tk.LEFT, padx=3)
+        self.center_y_num = tk.Spinbox(self.camera_frame,
+                                     from_=0, to=512,
+                                     increment=1,
+                                     width=4,
+                                     command=self.animation_build_frame,
+                                     textvariable=default_center_y)
+        self.center_y_num.bind("<Return>", self.animation_build_pose_return)
+        self.center_y_num.pack(side=tk.LEFT)
+
+        self.zoom_label = tk.Label(self.camera_frame, text="Zoom:")
+        self.zoom_label.pack(side=tk.LEFT,padx=3)
+        self.zoom_num = ttk.Combobox(self.camera_frame,
+                                     state="readonly",
+                                     values=zoom_values)
+        self.zoom_num.config(width=7)
+        self.zoom_num.set("x2")
+        self.zoom_num.bind("<Return>", self.animation_build_pose_return)
+        self.zoom_num.bind("<<ComboboxSelected>>", self.animation_build_pose_return)
+        self.zoom_num.pack(side=tk.LEFT)
+        
+        self.camera_frame.pack(pady=2)
+
+
         self.loaded_obj_label = tk.Label(self.animation_preview, textvariable=obj_file)
-        self.loaded_obj_label.pack()
-        self.loaded_col_label = tk.Label(self.animation_preview, textvariable=col_file)
-        self.loaded_col_label.pack()
+        self.loaded_obj_label.pack(anchor=tk.W)
         self.loaded_cgx_label = tk.Label(self.animation_preview, textvariable=cgx_file)
-        self.loaded_cgx_label.pack()
+        self.loaded_cgx_label.pack(anchor=tk.W)
+        self.loaded_col_label = tk.Label(self.animation_preview, textvariable=col_file)
+        self.loaded_col_label.pack(anchor=tk.W)
 
         self.frame_canvas = tk.Canvas(self.animation_preview,width=512,height=512)
         self.frame_canvas.pack()
@@ -198,7 +283,30 @@ class MainFrame(tk.Frame):
         
     def animation_build_frame(self):
         if decoded_cgx != [] and decoded_col != [] and decoded_obj != []:
+            size_settings = {
+                "0": [8,8,16,16],
+                "1": [8,8,32,32],
+                "2": [8,8,64,64],
+                "3": [16,16,32,32],
+                "4": [16,16,64,64],
+                "5": [32,32,64,64],
+                "6": [16,32,32,64],
+                "7": [16,32,32,32]
+            }
+            zoom_settings = {
+                "0": 1,
+                "1": 2,
+                "2": 3,
+                "3": 4,
+                "4": 5,
+                "5": 6,
+                "6": 7,
+                "7": 8
+            }
+            
             self.frame_canvas.delete("all")
+            self.frame_canvas.create_rectangle(0,0,512,512,outline="", fill="#0060B8")
+
             try:
                 frame_number = int(self.frame_num.get())
             except ValueError:
@@ -211,143 +319,109 @@ class MainFrame(tk.Frame):
                 default_offset.set("0")
                 spr_offset = 0
                 print ("Invalid data in VRAM Offset field. Resetting value...")
-            self.frame_canvas.create_rectangle(0,0,512,512,outline="", fill="#0060B8")
-            for i in range(63, -1, -1):
-                if (decoded_obj["frame "+str(frame_number)][(i)*6+0] & 0x80) == 0:
+                
+            try:
+                center_x = int(default_center_x.get())
+            except:
+                default_center_x.set("256")
+                center_x = 0
+                print ("Invalid data in Camera X Offset field. Resetting value...")
+            try:
+                center_y = int(default_center_y.get())
+            except:
+                default_center_y.set("256")
+                center_y = 0
+                print ("Invalid data in Camera Y Offset field. Resetting value...")
+
+            pal_base = 128
+            current_size = size_settings[str(self.size_num.current())]
+            current_zoom = zoom_settings[str(self.zoom_num.current())]
+
+            if obj_loaded == 0:
+                oam = 63
+            elif obj_loaded == 1:
+                oam = 127
+
+            for i in range(oam, -1, -1):
+                current_obj = decoded_obj["frame "+str(frame_number)]
+                if (current_obj[i*6+0] & 0x80) == 0:
                     continue
-                size = decoded_obj["frame "+str(frame_number)][(i)*6+0] & 0x01
-                ydisp = decoded_obj["frame "+str(frame_number)][(i)*6+2]
-                xdisp = decoded_obj["frame "+str(frame_number)][(i)*6+3]
-                props = decoded_obj["frame "+str(frame_number)][(i)*6+4]
-                tile = decoded_obj["frame "+str(frame_number)][(i)*6+5]
-                pal_base = 128
-                px = []
-                center_x = 224
-                center_y = 256
+                size = (current_obj[i*6+0] & 0x01) * 2
+                ydisp = current_obj[i*6+2]
+                xdisp = current_obj[i*6+3]
+                props = current_obj[i*6+4]
+                tile = current_obj[i*6+5]
+
                 if xdisp >= 0x80:
                     xdisp = self.twos_comp(xdisp, 8)
                 if ydisp >= 0x80:
                     ydisp = self.twos_comp(ydisp, 8)
-                offx = xdisp*2+center_x
-                offy = ydisp*2+center_y
+                offx = xdisp*current_zoom+center_x
+                offy = ydisp*current_zoom+center_y
+
                 tile_offset = (((props&1)<<8)+tile)<<6
-                tile_pal = ((props&0xF)>>1)*16
-                #print("size "+str(size)+"      offx: "+str(offx)+" offy:  "+str(offy)+"    xdisp: "+str(xdisp)+" ydisp: "+str(ydisp))
+                tile_pal = ((props&0xF)>>1)*16 + pal_base
 
+                size_x = current_size[0+size]
+                size_y = current_size[1+size]
+                total_pixels = size_x*size_y
 
-                if size == 1:
+            #Process tiles
+            #COULD BE MADE MUCH FASTER BUT I'M BAD AT PROGRAMMING
+            #IF IT WORKS, IT WORKS :D
+                px = []
+                for a in range(total_pixels):
+                    px.append(0)
+                try:
+                    for n in range(size_y):
+                        for m in range(size_x):
+                            px_col = m&0x7
+                            px_row = (n&0x7)*(1<<3)
+                            tile_col = (m&0xFFF8)*(1<<3)
+                            tile_row = (n&0xFFF8)*(1<<7)
+                            l = spr_offset + tile_offset + tile_col + tile_row + px_col + px_row
+                            if decoded_cgx[l] == 0:
+                                px[m+(n*size_x)] = 0
+                            else:
+                                px[m+(n*size_x)] = decoded_cgx[l] + tile_pal
+                except IndexError:
+                            print ("Exceeded limits of CGX file. Change the VRAM Offset.")
 
-                    #Process tiles of 16x16
-                    #COULD BE MADE SMALLER BUT I'M BAD AT PROGRAMMING
-                    #IF IT WORKS, IT WORKS :D
-                    for a in range(256):
-                        px.append(0)
-                    try:
-                        for n in range(16):
-                            for m in range(16):
-                                px_col = m&7
-                                px_row = (n&7)*(1<<3)
-                                tile_col = (m&0x8)*(1<<3)
-                                tile_row = (n&0x8)*(1<<7)
-                                l = spr_offset+tile_offset+px_col+px_row+tile_col+tile_row
-                                if decoded_cgx[l] == 0:
-                                    px[m+(n*16)] = 0
-                                else:
-                                    px[m+(n*16)] = (decoded_cgx[l])+pal_base+tile_pal
-                                #print("Pixel: "+str(px[m+(n*16)])+" "+str(m+(n*16)))
-                                #print("Indices: "+str(px_col)+" "+str(px_row)+"   "+str(tile_col)+" "+str(tile_row))
-                    except IndexError:
-                                print ("Exceeded limits of CGX file. Change the VRAM Offset.")
+                if props&0x80 != 0:
+                    #y-flip tile if needed
+                    t = 0
+                    v = len(px)-size_x
+                    old_px = px.copy()
+                    for u in range(len(px)):
+                        if u&size_x != t:
+                            v=v-(size_x*2)
+                        t=u&size_x
+                        px[u] = old_px[v]
+                        v=v+1
 
-                    if props&0x80 != 0:
-                        #y-flip tile if needed
-                        t = 0
-                        v = len(px)-16
-                        old_px = px.copy()
-                        for u in range(len(px)):
-                            if u&16 != t:
-                                v=v-32
-                            t=u&16
-                            px[u] = old_px[v]
-                            v=v+1
+                if props&0x40 != 0:
+                    #x-flip tile if needed
+                    t = 0
+                    v = size_x-1
+                    old_px = px.copy()
+                    s = total_pixels-size_x
+                    for u in range(len(px)):
+                        if u&s != t:
+                            v=size_x-1
+                        t=u&s
+                        px[u] = old_px[t+v]
+                        v=v-1
 
-                    if props&0x40 != 0:
-                        #x-flip tile if needed
-                        t = 0
-                        v = 15
-                        s = 0
-                        old_px = px.copy()
-                        for u in range(len(px)):
-                            if u&0xF0 != t:
-                                v=15
-                            t=u&0xF0
-                            px[u] = old_px[t+v]
-                            v=v-1
-                    
-                #draw tile
-                    for y in range(16):
-                        for x in range(16):
-                            if px[x+y*16] != 0:
-                                self.frame_canvas.create_rectangle(offx+x*2,offy+y*2,offx+x*2+2,offy+y*2+2,
-                                                                   outline="",
-                                                                   fill=decoded_col[px[x+y*16]])
-                    #return
-                else:
-                    #Process tiles of 8x8
-                    #COULD BE MADE SMALLER BUT I'M BAD AT PROGRAMMING
-                    #IF IT WORKS, IT WORKS :D
-                    for a in range(64):
-                        px.append(0)
-                    try:
-                        for n in range(8):
-                            for m in range(8):
-                                px_col = m&7
-                                px_row = (n&7)*(1<<3)
-                                tile_col = (m&0x8)*(1<<3)
-                                tile_row = (n&0x8)*(1<<7)
-                                l = spr_offset+tile_offset+px_col+px_row+tile_col+tile_row
-                                if decoded_cgx[l] == 0:
-                                    px[m+(n*8)] = 0
-                                else:
-                                    px[m+(n*8)] = (decoded_cgx[l])+pal_base+tile_pal
-                                #print("Pixel: "+str(px[m+(n*16)])+" "+str(m+(n*16)))
-                                #print("Indices: "+str(px_col)+" "+str(px_row)+"   "+str(tile_col)+" "+str(tile_row))
-                    except IndexError:
-                                print ("Exceeded limits of CGX/VRAM file. Change the VRAM Offset.")
-
-                    if props&0x80 != 0:
-                        #y-flip tile if needed
-                        t = 0
-                        v = len(px)-8
-                        old_px = px.copy()
-                        for u in range(len(px)):
-                            if u&8 != t:
-                                v=v-16
-                            t=u&8
-                            px[u] = old_px[v]
-                            v=v+1
-
-                    if props&0x40 != 0:
-                        #x-flip tile if needed
-                        t = 0
-                        v = 7
-                        s = 0
-                        old_px = px.copy()
-                        for u in range(len(px)):
-                            if u&0x38 != t:
-                                v=7
-                            t=u&0x38
-                            #print ("u: "+str(u)+"   u&7: "+str(u&0x7)+"  v: "+str(v)+"  t: "+str(t)+"    t+v: "+str(t+v))
-                            px[u] = old_px[t+v]
-                            v=v-1
-                    
-                #draw tile
-                    for y in range(8):
-                        for x in range(8):
-                            if px[x+y*8] != 0:
-                                self.frame_canvas.create_rectangle(offx+x*2,offy+y*2,offx+x*2+2,offy+y*2+2,
-                                                                   outline="",
-                                                                   fill=decoded_col[px[x+y*8]])
+            #draw tile
+                for y in range(size_y):
+                    for x in range(size_x):
+                        if px[x+y*size_x] != 0:
+                            self.frame_canvas.create_rectangle(offx+x*current_zoom,
+                                                               offy+y*current_zoom,
+                                                               offx+x*current_zoom+current_zoom,
+                                                               offy+y*current_zoom+current_zoom,
+                                                               outline="",
+                                                               fill=decoded_col[px[x+y*size_x]])
 
     #taken from stack overflow LOL
     #https://stackoverflow.com/a/9147327
@@ -366,6 +440,13 @@ if __name__ == "__main__":
     decoded_cgx = []
     decoded_col = []
     decoded_obj = {}
+
+    obj_loaded = 0 
+            #valid values
+            # 0: OBJ
+            # 1: OBX
+            # 2: OBZ (not implemented)
+    
     obj_file = tk.StringVar()
     obj_file.set("OBJ File: ")
     cgx_file = tk.StringVar()
@@ -376,6 +457,37 @@ if __name__ == "__main__":
     default_offset.set("32768")
     default_frame = tk.StringVar()
     default_frame.set("0")
+    
+    default_center_x = tk.StringVar()
+    default_center_x.set("256")
+    default_center_y = tk.StringVar()
+    default_center_y.set("256")
+
+    obj_sizes = [
+        "8x8 16x16",
+        "8x8 32x32",
+        "8x8 64x64",
+        "16x16 32x32",
+        "16x16 64x64",
+        "32x32 64x64",
+        "16x32 32x64",
+        "16x32 32x32"
+    ]
+    object_size = tk.StringVar()
+    object_size.set(obj_sizes[0])
+
+    zoom_values = [
+        "x1",
+        "x2",
+        "x3",
+        "x4",
+        "x5",
+        "x6",
+        "x7",
+        "x8"
+    ]
+    zoom = tk.StringVar()
+    zoom.set(zoom_values[0])
 
     #setup main frames/parts of the program
     toolbar = Toolbar(root)
@@ -383,6 +495,6 @@ if __name__ == "__main__":
 
     #setup window
     root.title("OBJ Viewer")
-    root.geometry("535x635")
+    root.geometry("535x663")
     root.resizable(False, False)
     root.mainloop()
