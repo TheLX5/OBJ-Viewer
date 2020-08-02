@@ -64,7 +64,7 @@ Each entry in the frames has the following format:
 * Byte 6: Tile number/ID
 
 #### Sequence Format
-Sequence data can be found 0x100 bytes later before the tool string, in most cases is at offset 0x3100 and its format is fairly straight forward. There's only 0x10 possible sequences and each sequence can have up to 0x10 frames with each having its own amount of time that will be displayed on screen.
+Sequence data can be found 0x100 bytes later before the tool string, in most cases is at offset 0x3100 (0xC100 for OBX) and its format is fairly straight forward. There's only 0x10 (0x20 for OBX?) possible sequences and each sequence can have up to 0x10 (0x20 for OBX) frames with each having its own amount of time that will be displayed on screen.
 
 Format: [Duration #1] [Frame #1] [Duration #2] [Frame #2] [...] [Duration #16] [Frame #16]
 
