@@ -76,6 +76,6 @@ Notes:
 
 
 #### SCad conversion details
-SCad almost accepts the default OBJ files, but they need a few changes before being displayed correctly, which is why I included a way to conver them to be SCad compatible.
+SCad almost accepts the default OBJ files, but they need a few changes before being displayed correctly, which is why I included a way to convert them to be SCad compatible.
 * Bytes 5 and 6 should be swapped for each entry.
-* Tile priority is reversed. It's determined from top to bottom, instead of from bottom to top.
+* Tile priority is reversed. It's determined from bottom to top, instead of from top to bottom.
