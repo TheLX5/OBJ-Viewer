@@ -4,7 +4,7 @@ A python script that lets you preview frames and animations from SNES OBJ files 
 ## REQUIREMENTS
 * Python 3 with Tkinter
 * Ttk module for Python (I forgot which version comes with Ttk, newer Python versions have Ttk by default, do your research)
-* Pillow module (`python -m pip install pillow`)
+* Pillow module (`python -m pip install pillow` or `pip3 install pillow`)
 
 ## NOTES
 * I'm not very proficient at high level languages so a lot of the code is REALLY bad and poorly thought out
