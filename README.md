@@ -1,5 +1,5 @@
 # OBJ Viewer
-A python script that lets you preview OBJ data if the required files are provided.
+A python script that lets you preview frames and animations from SNES OBJ files if the required files are provided.
 
 ## REQUIREMENTS
 * Python 3 with Tkinter
