@@ -54,7 +54,8 @@ OBJ and OBX files are very similar to how OAM works on the SNES. They're almost 
 
 There are up to 32 unique frames on a OBJ file (64 frames on OBX files). Each frame contains 6 byte entries and OBJ files have 64 available entry slots (OBX have 128) per frame.
 
-#### OBJ Format
+#### OBJ/OBJ Format
+Each entry in the frames has the following format:
 * Byte 1: Display tile (bit 7), tile size (bit 0)
 * Byte 2: Group info (unknown usage, mentioned in SCad docs)
 * Byte 3: Displacement on Y axis (0x0-0x7F down, 0xFF-0x80 up)
@@ -62,17 +63,19 @@ There are up to 32 unique frames on a OBJ file (64 frames on OBX files). Each fr
 * Byte 5: Attribute data (YXPPCCCT)
 * Byte 6: Tile number/ID
 
-#### OBX Format
-* Byte 1: Display tile (bit 7), tile size (bit 0)
-* Byte 2: Group info (unknown usage, mentioned in SCad docs)
-* Byte 3: Displacement on Y axis (0x0-0x7F down, 0xFF-0x80 up)
-* Byte 4: Displacement on X axis (0x0-0x7F right, 0xFF-0x80 left)
-* Byte 5: Attribute data (YXPPCCCT)
-* Byte 6: Tile number/ID
+#### Sequence Format
+Sequence data can be found 0x100 bytes later before the tool string, in most cases is at offset 0x3100 and its format is fairly straight forward. There's only 0x10 possible sequences and each sequence can have up to 0x10 frames with each having its own amount of time that will be displayed on screen.
+
+Format: [Duration #1] [Frame #1] [Duration #2] [Frame #2] [...] [Duration #16] [Frame #16]
+
+Notes:
+* Duration means how long the frame will be shown, OBJ Viewer treats this duration as 16ms, SCad is somewhere around this value as well.
+* Frame is the number of the frame that will be shown on the animation at that specific moment.
+* If both Duration and Frame are 0 in a sequence the sequence ends.
+* There's space to put more frames on a sequence, but SCad treats that data as X/Y displacements, even if these are never read by the tool upon loading a .OBJ file.
 
 
 #### SCad conversion details
 SCad almost accepts the default OBJ files, but they need a few changes before being displayed correctly, which is why I included a way to conver them to be SCad compatible.
 * Bytes 5 and 6 should be swapped for each entry.
-* Tile priority is determined from top to bottom, instead of from bottom to top.# OBJ Viewer
-A small python script that lets you preview OBJ data if the required files are provided.
+* Tile priority is reversed. It's determined from top to bottom, instead of from bottom to top.
