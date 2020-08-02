@@ -69,7 +69,7 @@ Sequence data can be found 0x100 bytes later before the tool string, in most cas
 Format: [Duration #1] [Frame #1] [Duration #2] [Frame #2] [...] [Duration #16] [Frame #16]
 
 Notes:
-* Duration means how long the frame will be shown, OBJ Viewer treats this duration as 16ms, SCad is somewhere around this value as well.
+* Duration means how long the frame will be shown, OBJ Viewer treats this duration by multiplying it by 16ms, SCad does something similar as well.
 * Frame is the number of the frame that will be shown on the animation at that specific moment.
 * If both Duration and Frame are 0 in a sequence the sequence ends.
 * There's space to put more frames on a sequence, but SCad treats that data as X/Y displacements, even if these are never read by the tool upon loading a .OBJ file.
