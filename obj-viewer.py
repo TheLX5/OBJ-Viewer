@@ -1,5 +1,5 @@
 ##################################################################################
-# OBJ-VIewer v3.0
+# OBJ-VIewer v3.1
 # By lx5
 # CGX image generator code from ZumiIsawhat?#5982
 # Repo & Info: https://github.com/TheLX5/OBJ-Viewer
