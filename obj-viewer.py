@@ -339,13 +339,19 @@ class Toolbar(tk.Frame):
 
         preview_cgx_window = tk.Toplevel()
         preview_cgx_window.title("CGX Preview")
-        preview_cgx_window.geometry("258x514")
+        preview_cgx_window.geometry("258x544")
         preview_cgx_window.resizable(False, False)
         preview_cgx_window.attributes("-topmost", "true")
 
-        self.canvas_preview_cgx = tk.Canvas(preview_cgx_window)
-        self.canvas_preview_cgx.pack(fill=tk.BOTH, expand=1, pady=1, padx=1, anchor=tk.CENTER)
+        self.canvas_preview_cgx = tk.Canvas(preview_cgx_window, width=256, height=512)
+        self.canvas_preview_cgx.pack(fill=tk.BOTH, expand=1, pady=1, padx=1, anchor=tk.N)
+        self.button_export_cgx = ttk.Button(preview_cgx_window,
+                                            text="Export CGX to an image",
+                                            command=self.export_cgx_image)
+        self.button_export_cgx.pack(fill=tk.X, expand=1, pady=1, padx=1, anchor=tk.N)
         
+
+
         if decoded_cgx != [] and decoded_col != []:
             self.update_cgx_canvas()
         else:
@@ -353,6 +359,18 @@ class Toolbar(tk.Frame):
             self.cgx_rectangle = self.canvas_preview_cgx.create_rectangle(0,0,256,512, outline="", fill=bg_color)
 
         preview_cgx_window.mainloop()
+
+    def export_cgx_image(self):
+        global cgx_file_path
+
+        start = time.time()
+        image = self.create_cgx_preview_image()
+        path_ = cgx_file_path.get()
+        try:
+            image.save("export_CGX_"+os.path.split(path_)[1].split(".")[0]+".png")
+            print ("Exported CGX file to an image succesfully in "+str(time.time()-start)+" seconds")
+        except:
+            print ("Failed to export CGX file. Is the directory read only?")
 
     def update_cgx_canvas(self):
         self.cgx_image = self.create_cgx_preview_image()
@@ -427,13 +445,17 @@ class Toolbar(tk.Frame):
 
         preview_col_window = tk.Toplevel()
         preview_col_window.title("COL Preview")
-        preview_col_window.geometry("258x258")
+        preview_col_window.geometry("258x288")
         preview_col_window.resizable(False, False)
         preview_col_window.attributes("-topmost", "true")
 
-        self.canvas_preview_col = tk.Canvas(preview_col_window)
-        self.canvas_preview_col.pack(fill=tk.BOTH, expand=1, pady=1, padx=1, anchor=tk.CENTER)
-        
+        self.canvas_preview_col = tk.Canvas(preview_col_window, width=256, height=256)
+        self.canvas_preview_col.pack(fill=tk.X, expand=1, pady=1, padx=1)
+        self.button_export_col = ttk.Button(preview_col_window,
+                                            text="Export COL to an image",
+                                            command=self.export_col_image)
+        self.button_export_col.pack(fill=tk.X, expand=1, pady=1, padx=1, anchor=tk.N)
+
         if decoded_col != []:
             self.update_col_canvas()
         else:
@@ -442,6 +464,17 @@ class Toolbar(tk.Frame):
 
         preview_col_window.mainloop()
 
+    def export_col_image(self):
+        global col_file_path
+
+        start = time.time()
+        image = self.create_col_preview_image()
+        path = col_file_path.get()
+        try:
+            image.save("export_COL_"+os.path.split(path_)[1].split(".")[0]+".png")
+            print ("Exported COL file to an image succesfully in "+str(time.time()-start)+" seconds")
+        except:
+            print ("Failed to export COL file. Is the directory read only?")
     
     def update_col_canvas(self):
         self.col_image = self.create_col_preview_image()
