@@ -89,6 +89,7 @@ SCad almost accepts the default OBJ files, but they need a few changes before be
 #### Version 3.0
 * Added windows to preview contents from CGX and COL files
 * Added a file explorer for OBJ, OBX, CGX and COL files
+* Added support for different versions of the OBJ format (and possibly OBX as well)
 * Fixed OBX files being treated as OBJ files by the decoder
 * Added more print statements to properly inform the user about what's happening behind the scenes
 
