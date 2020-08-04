@@ -4,12 +4,13 @@ A python script that lets you preview frames and animations from SNES OBJ files 
 ## REQUIREMENTS
 * Python 3 with Tkinter
 * Ttk module for Python (I forgot which version comes with Ttk, newer Python versions have Ttk by default, do your research)
-* Pillow module (`python -m pip install pillow` or `pip3 install pillow`)
+* Pillow module for Python (`python -m pip install pillow` or `pip3 install pillow`)
 
 ## NOTES
 * I'm not very proficient at high level languages so a lot of the code is REALLY bad and poorly thought out
 * It may spam a little bit your console if you go out of bounds of the VRAM area
-* OBX files are **PARTIALLY** supported at this moment. They make use of the second byte on each entry which is currently unknown to me and their displays on the preview area doesn't seem correct.
+* OBX files are **PARTIALLY** supported at this moment. They make use of the second byte on each entry which is currently unknown to me.
+* Opening files while CGX Preview and/or COL Preview windows are active will **SLOW DOWN** the program, especially when changing the CGRAM offset and loading new files!
 
 ## PROGRAM DETAILS
 
@@ -54,10 +55,10 @@ OBJ and OBX files are very similar to how OAM works on the SNES. They're almost 
 
 There are up to 32 unique frames on a OBJ file (64 frames on OBX files). Each frame contains 6 byte entries and OBJ files have 64 available entry slots (OBX have 128) per frame.
 
-#### OBJ/OBJ Format
+#### OBJ/OBX Format 
 Each entry in the frames has the following format:
 * Byte 1: Display tile (bit 7), tile size (bit 0)
-* Byte 2: Group info (unknown usage, mentioned in SCad docs)
+* Byte 2: Unknown usage (mentioned in SCad docs as Group Info in their SOB format)
 * Byte 3: Displacement on Y axis (0x0-0x7F down, 0xFF-0x80 up)
 * Byte 4: Displacement on X axis (0x0-0x7F right, 0xFF-0x80 left)
 * Byte 5: Attribute data (YXPPCCCT)
@@ -74,8 +75,38 @@ Notes:
 * If both Duration and Frame are 0 in a sequence the sequence ends.
 * There's space to put more frames on a sequence, but SCad treats that data as X/Y displacements, even if these are never read by the tool upon loading a .OBJ file.
 
+#### Tool versions and revisions
+The software NAK1989 S-CG-CAD had some different versions and revisions according to the files in Hino's folder, and some of them modified the OBJ format a little bit. The version 1.10 below revision 920000 and version 1.23 had the same format. Version 1.10 above revision 920000 swapped Byte 5 and Byte 6 from the standard entry format, making it the same to SCad's format. Version 1.23 added support for OBX files.
+
+*I need confirmation on the revision number for version 1.10 about the format change and OBX support starting from version 1.23
 
 #### SCad conversion details
 SCad almost accepts the default OBJ files, but they need a few changes before being displayed correctly, which is why I included a way to convert them to be SCad compatible.
 * Bytes 5 and 6 should be swapped for each entry.
 * Tile priority is reversed. It's determined from bottom to top, instead of from top to bottom.
+
+## Changelog
+#### Version 3.0
+* Added windows to preview contents from CGX and COL files
+* Added a file explorer for OBJ, OBX, CGX and COL files
+* Fixed OBX files being treated as OBJ files by the decoder
+* Added more print statements to properly inform the user about what's happening behind the scenes
+
+#### Version 2.0
+* New UI
+* Support for sequence playback
+* Optimized the program to use images instead of tkinter's rectangles to draw on the preview area.
+* Added controls to offset CGRAM
+* Added a way to export frames as .png images
+* Added a way to change the background color
+
+#### Version 1.1
+* Added proper OBX support
+* Added a way to change the Object Sizes
+* Added a way to offset the camera
+* Added a way to change zoom levels
+* Justified to the left the current loaded files
+* Made the code smaller, but not faster
+
+#### Version 1.0
+* Initial release
