@@ -1,18 +1,18 @@
 # OBJ Viewer
 A python script that lets you preview frames and animations from SNES OBJ files if the required files are provided.
 
-## REQUIREMENTS
+## Requirements
 * Python 3 with Tkinter
 * Ttk module for Python (I forgot which version comes with Ttk, newer Python versions have Ttk by default, do your research)
 * Pillow module for Python (`python -m pip install pillow` or `pip3 install pillow`)
 
-## NOTES
+## Notes
 * I'm not very proficient at high level languages so a lot of the code is REALLY bad and poorly thought out
 * It may spam a little bit your console if you go out of bounds of the VRAM area
 * OBX files are **PARTIALLY** supported at this moment. They make use of the second byte on each entry which is currently unknown to me.
-* Opening files while CGX Preview and/or COL Preview windows are active will **SLOW DOWN** the program, especially when changing the CGRAM offset and loading new files!
+* Opening files while CGX Preview and/or COL Preview windows are active will **SLOW DOWN** the loading of such files, this also applies when changing the CGRAM Offset.
 
-## PROGRAM DETAILS
+## Program details
 
 #### General
 You can use the UP and DOWN keys to quickly change the Spin boxes.
@@ -76,7 +76,7 @@ Notes:
 * There's space to put more frames on a sequence, but SCad treats that data as X/Y displacements, even if these are never read by the tool upon loading a .OBJ file.
 
 #### Tool versions and revisions
-The software NAK1989 S-CG-CAD had some different versions and revisions according to the files in Hino's folder, and some of them modified the OBJ format a little bit. The version 1.10 below revision 920000 and version 1.23 had the same format. Version 1.10 above revision 920000 swapped Byte 5 and Byte 6 from the standard entry format, making it the same to SCad's format. Version 1.23 added support for OBX files.
+The software NAK1989 S-CG-CAD had some different versions and revisions according to the files in Hino's folder, and some of them modified the OBJ format a little bit. The version 1.10 below revision 920000 and version 1.23 had the same format. Version 1.10 above revision 920000 swapped Byte 5 and Byte 6 from the standard entry format and reverses the tile priority order, making it the same to SCad's format. Version 1.23 added support for OBX files.
 
 *I need confirmation on the revision number for version 1.10 about the format change and OBX support starting from version 1.23
 
