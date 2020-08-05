@@ -86,6 +86,10 @@ SCad almost accepts the default OBJ files, but they need a few changes before be
 * Tile priority is reversed. It's determined from bottom to top, instead of from top to bottom.
 
 ## Changelog
+#### Version 3.2
+* Added support for .BAK files in the File Explorer frames at the right
+* Fixed OBX files being decoded as OBJ when loading them from the OBJ/OBX Explorer
+
 #### Version 3.1
 * Added a way to export CGX and COL files as images
 
