@@ -1,5 +1,5 @@
 ##################################################################################
-# OBJ-VIewer v3.1
+# OBJ-VIewer v3.2
 # By lx5
 # CGX image generator code from ZumiIsawhat?#5982
 # Repo & Info: https://github.com/TheLX5/OBJ-Viewer
@@ -144,11 +144,13 @@ class Toolbar(tk.Frame):
         for root, dirs, files in os.walk(os.path.split(filename)[0]):
             for file_ in files:
                 checks = file_.split(".")[-1].lower()
-                if checks == "cgx":
+                if checks == "bak":
+                    checks = file_.split(".")[-2].lower()
+                if (checks == "cgx"):
                     append_path = os.path.join(root, file_).split(os.path.split(filename)[0])[1]
                     self.cgx_tree_files.append(append_path)
                     mainframe.cgx_treeview.insert("", tk.END, text=append_path[1:], tags="file")
-                elif checks == "col":
+                elif (checks == "col"):
                     append_path = os.path.join(root, file_).split(os.path.split(filename)[0])[1]
                     self.col_tree_files.append(append_path)
                     mainframe.col_treeview.insert("", tk.END, text=append_path[1:], tags="file")
@@ -596,6 +598,7 @@ class MainFrame(tk.Frame):
         self.obj_treeview.pack(fill=tk.X, expand=1, pady=3, anchor=tk.N)
 
     def obj_file_selected(self, event):
+        global obj_loaded
         start = time.time()
         self.sequence_stop_button()
         item = self.obj_treeview.selection()[0]
